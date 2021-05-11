@@ -1,22 +1,26 @@
 package ru.netology.domain;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Issue {
     private final int id;
     private final String name;
     private boolean open;
     private final String author;
     private final String assignee;
-    private final String label;
+    private final Set<Label> label = new HashSet<>();
 
-    public Issue(int id, String name, boolean open, String author, String assignee, String label) {
+    public Issue(int id, String name, boolean open, String author, String assignee, Label label) {
         this.id = id;
         this.name = name;
         this.open = open;
         this.author = author;
         this.assignee = assignee;
-        this.label = label;
+        this.label.add(label);
     }
+
 
     public int getId() {
         return id;
@@ -41,20 +45,7 @@ public class Issue {
     }
 
 
-    public String getLabel() {
+    public Set<Label> getLabel() {
         return label;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Issue{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", open=" + open +
-                ", author='" + author + '\'' +
-                ", assignee='" + assignee + '\'' +
-                ", label='" + label + '\'' +
-                '}';
     }
 }

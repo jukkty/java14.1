@@ -3,10 +3,7 @@ package ru.netology.manager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.netology.domain.Issue;
-import ru.netology.domain.NotFoundException;
-import ru.netology.domain.SortByNewest;
-import ru.netology.domain.SortByOldest;
+import ru.netology.domain.*;
 import ru.netology.repository.IssueRepo;
 
 import java.util.Collection;
@@ -21,11 +18,11 @@ class IssueManagerTest {
     SortByNewest comparatorNewest = new SortByNewest();
     SortByOldest comparatorOldest = new SortByOldest();
 
-    private final Issue firstIssue = new Issue(1, "First", true, "author1", "assignee1", "label1");
-    private final Issue secondIssue = new Issue(2, "Second", true, "author2", "assignee2", "label2");
-    private final Issue thirdIssue = new Issue(3, "Third", false, "author3", "assignee3", "label3");
-    private final Issue fourthIssue = new Issue(4, "Fourth", false, "author1", "assignee2", "label4");
-    private final Issue fifthIssue = new Issue(5, "Fifth", true, "author3", "assignee3", "label1");
+    private final Issue firstIssue = new Issue(1, "First", true, "author1", "assignee1", Label.label1);
+    private final Issue secondIssue = new Issue(2, "Second", true, "author2", "assignee2", Label.label2);
+    private final Issue thirdIssue = new Issue(3, "Third", false, "author3", "assignee3", Label.label3);
+    private final Issue fourthIssue = new Issue(4, "Fourth", false, "author1", "assignee2", Label.label4);
+    private final Issue fifthIssue = new Issue(5, "Fifth", true, "author3", "assignee3", Label.label5);
 
     @BeforeEach
     void setUp() {
@@ -44,7 +41,7 @@ class IssueManagerTest {
     @Test
     @DisplayName("Добавляет новый issue")
     public void shouldAddNewIssue() {
-        Issue sixthIssue = new Issue(6, "Sixth", true, "author1", "assignee2", "label6");
+        Issue sixthIssue = new Issue(6, "Sixth", true, "author1", "assignee2", Label.label5);
 
         manager.add(sixthIssue);
         Collection<Issue> expected = manager.getAll();
@@ -75,10 +72,8 @@ class IssueManagerTest {
     @Test
     @DisplayName("Фильтрует issues по label")
     public void shouldSearchByLabel() {
-        String label = "label1";
-        Predicate<String> equalLabel = t -> t.equalsIgnoreCase(label);
-        Collection<Issue> expected = List.of(firstIssue, fifthIssue);
-        Collection<Issue> actual = manager.filteredByLabel(equalLabel);
+        Collection<Issue> expected = List.of(firstIssue);
+        Collection<Issue> actual = manager.filteredByLabel(Label.label1);
         assertEquals(expected, actual);
     }
 
@@ -86,7 +81,7 @@ class IssueManagerTest {
     @DisplayName("Показывает список всех открытых issues")
     public void shouldShowAllOpenedIssues() {
         Collection<Issue> expected = List.of(firstIssue, secondIssue, fifthIssue);
-        Collection actual = manager.openedIssues();
+        Collection<Issue> actual = manager.openedIssues();
         assertEquals(expected, actual);
     }
 
@@ -94,7 +89,7 @@ class IssueManagerTest {
     @DisplayName("Показывает список всех закрытых issues")
     public void shouldShowAllClosedIssues() {
         Collection<Issue> expected = List.of(thirdIssue, fourthIssue);
-        Collection actual = manager.closedIssues();
+        Collection<Issue> actual = manager.closedIssues();
         assertEquals(expected, actual);
     }
 
@@ -103,7 +98,7 @@ class IssueManagerTest {
     public void shouldOpenIssues() {
         manager.openIssue(3);
         Collection<Issue> expected = List.of(firstIssue, secondIssue, thirdIssue, fifthIssue);
-        Collection actual = manager.openedIssues();
+        Collection<Issue> actual = manager.openedIssues();
         assertEquals(expected, actual);
     }
 
@@ -113,7 +108,7 @@ class IssueManagerTest {
         manager.closeIssue(1);
         manager.closeIssue(2);
         Collection<Issue> expected = List.of(firstIssue, secondIssue, thirdIssue, fourthIssue);
-        Collection actual = manager.closedIssues();
+        Collection<Issue> actual = manager.closedIssues();
         assertEquals(expected, actual);
     }
 
@@ -148,21 +143,23 @@ class IssueManagerTest {
     }
 
     @Test
-    @DisplayName("Пройдет exception так как все issues открыты")
+    @DisplayName("Должен показать пустую коллекцию,если нет закрытых")
     public void shouldShowEmptyIfAllOpened() {
         manager.openIssue(3);
         manager.openIssue(4);
-        assertThrows(NotFoundException.class, () -> manager.closedIssues(), "Закрытые issues присутствуют");
-
+        Collection<Issue> expected = List.of();
+        Collection<Issue> actual = manager.closedIssues();
+        assertEquals(expected, actual);
     }
 
     @Test
-    @DisplayName("Пройдет exception так как все issues закрыты")
+    @DisplayName("Должен показать пустую коллекцию,если нет открытых")
     public void shouldShowEmptyIfAllClosed() {
         manager.closeIssue(1);
         manager.closeIssue(2);
         manager.closeIssue(5);
-        assertThrows(NotFoundException.class, () -> manager.openedIssues(), "Открытые issues присутствуют");
-
+        Collection<Issue> expected = List.of();
+        Collection<Issue> actual = manager.openedIssues();
+        assertEquals(expected, actual);
     }
 }

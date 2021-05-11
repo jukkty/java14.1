@@ -1,12 +1,10 @@
 package ru.netology.manager;
 
 import ru.netology.domain.Issue;
-import ru.netology.domain.NotFoundException;
+import ru.netology.domain.Label;
 import ru.netology.repository.IssueRepo;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class IssueManager {
@@ -37,25 +35,25 @@ public class IssueManager {
         repository.closeIssue(id);
     }
 
-    public Collection openedIssues() {
+    public Collection<Issue> openedIssues() {
         Collection<Issue> opened = new ArrayList<>();
         for (Issue issue : repository.findAll()) {
             if (issue.isOpen()) {
                 opened.add(issue);
             }
         }
-        if (opened.isEmpty()) throw new NotFoundException("Открытых issue нет");
+        if (opened.isEmpty()) return new ArrayList<>();
         return opened;
     }
 
-    public Collection closedIssues() {
+    public Collection<Issue> closedIssues() {
         Collection<Issue> closed = new ArrayList<>();
         for (Issue issue : repository.findAll()) {
             if (!issue.isOpen()) {
                 closed.add(issue);
             }
         }
-        if (closed.isEmpty()) throw new NotFoundException("Закрытых issue нет");
+        if (closed.isEmpty()) return new ArrayList<>();
         return closed;
     }
 
@@ -69,10 +67,10 @@ public class IssueManager {
         return result;
     }
 
-    public Collection<Issue> filteredByLabel(Predicate<String> predicate) {
+    public Collection<Issue> filteredByLabel(Label label) {
         Collection<Issue> result = new ArrayList<>();
         for (Issue issue : repository.findAll()) {
-            if (predicate.test(issue.getLabel())) {
+            if (issue.getLabel().contains(label)) {
                 result.add(issue);
             }
         }
